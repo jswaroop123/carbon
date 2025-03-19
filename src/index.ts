@@ -19,6 +19,20 @@ hono.get("/student", async (context) => {
   );
 })
 
+hono.get("/student/proctor", async (context) => {
+  const student = await prisma.student.findMany({
+    include: {
+      proctor: true,
+    },
+  });
+
+  return context.json(
+    {
+      student,
+    },
+    200
+  );
+})
 
 
 hono.post("/student", async (context) => {
@@ -82,7 +96,6 @@ hono.get("/professor", async (context) => {
     200
   );
 })
-
 
 
 serve(hono);
