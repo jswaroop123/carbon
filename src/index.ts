@@ -97,6 +97,49 @@ hono.get("/professor", async (context) => {
   );
 })
 
+hono.get("/professor/:professorId/proctorships", async (context) => {
+  const { professorId } = context.req.param();
+  const student = await prisma.student.findMany({
+    where: {
+      proctorId: professorId,
+    },
+  });
+  return context.json({
+    student,
+  },200);
+  
+})
 
+hono.get("/student/:id", async (c)=>{
+  const {id} = c.req.param();
+  const student = await prisma.student.findUnique({
+    where:{
+      id,
+    }
+  })
+
+  return c.json({
+    student,
+  },200)
+})
+
+hono.patch("/students/:studentId", async (c)=>{
+  const {studentId} = c.req.param();
+  const {name,dateOfBirth,aadharNumber,proctorId} = await c.req.json();
+  const student = await prisma.student.update({
+    where:{
+      id: studentId,
+    },
+    data:{
+      name,
+      dateOfBirth,
+      aadharNumber,
+      proctorId,
+    }
+  })
+  return c.json({
+    student,
+  },200)
+})
 serve(hono);
 console.log(`Server is running on http://localhost:${3000}`)
