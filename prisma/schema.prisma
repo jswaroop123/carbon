@@ -18,7 +18,7 @@ model Student{
   name String
   dateOfBirth DateTime
   aadharNumber String @unique
-  proctorId String @unique
+  proctorId String 
   proctor professor @relation(fields: [proctorId], references: [id]) 
   libraryMembership LibraryMembership?
 
