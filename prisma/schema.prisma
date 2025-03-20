@@ -13,38 +13,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Student{
-  id String @id @default(uuid())
-  name String
-  dateOfBirth DateTime
-  aadharNumber String @unique
-  proctorId String ?
-  proctor professor? @relation(fields: [proctorId], references: [id]) 
+model Student {
+  id                String             @id @default(uuid())
+  name              String
+  dateOfBirth       DateTime
+  aadharNumber      String             @unique
+  proctorId         String?
+  proctor           professor?         @relation(fields: [proctorId], references: [id])
   libraryMembership LibraryMembership?
-
 }
 
-model professor{
-  id String @id @default(uuid())
-  name String
-  seniority seniority
-  aadharNumber String @unique
-  student Student[]
-
+model professor {
+  id           String    @id @default(uuid())
+  name         String
+  seniority    seniority
+  aadharNumber String    @unique
+  student      Student[]
 }
 
-model LibraryMembership{
-  id String @id @default(uuid())
-  studentId String @unique
-  student Student @relation(fields: [studentId], references: [id])
-  issueDate DateTime
+model LibraryMembership {
+  id         String   @id @default(uuid())
+  studentId  String   @unique
+  student    Student  @relation(fields: [studentId], references: [id])
+  issueDate  DateTime
   expiryDate DateTime
 }
 
-enum seniority{
+enum seniority {
   JUNIOR
   SENIOR
   ASSOCIATE
   HEAD
 }
-

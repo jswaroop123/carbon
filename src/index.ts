@@ -36,14 +36,12 @@ hono.get("/student/proctor", async (context) => {
 
 
 hono.post("/student", async (context) => {
-  const { name, dateOfBirth, aadharNumber, proctorId } = await context.req.json();
-try{
+  const { name, dateOfBirth, aadharNumber} = await context.req.json();
   const student = await prisma.student.create({
     data: {
       name,
       dateOfBirth,
       aadharNumber,
-      proctorId,
     },
   });
 
@@ -53,11 +51,7 @@ try{
     },
     200
   );
-}
 
-catch(error){
-  console.error("Error fetching students:", error);
-}
 })
 
 
@@ -141,5 +135,94 @@ hono.patch("/students/:studentId", async (c)=>{
     student,
   },200)
 })
+
+hono.patch("/professors/:professorId", async (c)=>{
+  const {professorId} = c.req.param();
+  const {name,seniority,aadharNumber} = await c.req.json(); 
+  const proctor = await prisma.professor.update({
+    where:{
+      id: professorId,
+    },
+    data:{
+      name,
+      seniority,
+      aadharNumber,
+    }
+  })
+  return c.json({
+    proctor,
+  },200)
+})
+
+hono.delete("/students/:studentId", async (c)=>{
+  const {studentId} = c.req.param();
+  const student = await prisma.student.delete({
+    where:{
+      id: studentId,
+    }
+  })
+  return c.json({
+    student,
+  },200)
+})
+
+hono.delete("/professor/:professorId",async(context)=>{
+  const{professorId}=context.req.param();
+  const professor=await prisma.professor.delete(
+    {
+      where:{id:professorId,
+  
+      }
+    })
+    return context.json({
+      professor},200
+    )
+  })
+
+  hono.post("/professors/:professorId/proctorships", async (context) => {
+    const profId = context.req.param("professorId");
+    const { studentId } = await context.req.json();
+  
+  
+    const updateStudentProctorship = await prisma.student.update({
+      where: { id: studentId },
+      data: { proctorId: profId },
+    });
+    return context.json(
+      { "Updated Student Proctorship": updateStudentProctorship },
+      200
+    );
+  });
+
+  hono.get("/students/:studentId/librarymembership", async (context) => {
+    const { studentId } = context.req.param();
+    const libraryMembership = await prisma.libraryMembership.findMany({
+      where: {
+        studentId: studentId,
+      },
+    });
+  
+    return context.json(
+      {
+        libraryMembership,
+      },
+      200
+    );
+  });
+
+  hono.post("/students/:studentId/library-membership", async (context) => {
+    const studentId = context.req.param("studentId");
+    const { issueDate, expiryDate } = await context.req.json();
+  
+    const libraryMembership = await prisma.libraryMembership.create({
+      data: {
+        studentId,
+        issueDate,
+       expiryDate,
+      },
+    });
+    return context.json({ libraryMembership }, 200);
+  });
+
 serve(hono);
 console.log(`Server is running on http://localhost:${3000}`)
