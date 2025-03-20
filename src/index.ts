@@ -224,5 +224,32 @@ hono.delete("/professor/:professorId",async(context)=>{
     return context.json({ libraryMembership }, 200);
   });
 
+  hono.patch("/students/:studentId/library-membership", async (context) => {  
+    const studentId = context.req.param("studentId");
+    const { issueDate, expiryDate } = await context.req.json();
+  
+    const libraryMembership = await prisma.libraryMembership.update({
+      where: {
+        studentId: studentId,
+      },
+      data: {
+        issueDate,
+        expiryDate,
+      },
+    });
+    return context.json({ libraryMembership }, 200);
+  });
+
+  hono.delete("/students/:studentId/library-membership", async (context) => {
+    const studentId = context.req.param("studentId");
+  
+    const libraryMembership = await prisma.libraryMembership.delete({
+      where: {
+        studentId: studentId,
+      },
+    });
+    return context.json({ libraryMembership }, 200);
+  })
+
 serve(hono);
 console.log(`Server is running on http://localhost:${3000}`)
